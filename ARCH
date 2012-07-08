@@ -1,0 +1,23 @@
+The architecture of polarized is intended to decouple the 'filtering' action
+from the action of fetching a list of IDs for use in the filter. If you have
+your data in another database besides mysql it should be relatively easy to
+write a plugin for that database and use it with polarized.
+
+The biggest complication with filtering lucene query results comes in mapping
+a set of external ids into a format lucene can use as a filter, which in this case,
+is lucene doc ids. Polarized handles this by creating a map from a shared 
+unique identifier to the lucene internal doc id for every document in your index. 
+This means all of your documents must have a unique single valued field that is 
+common between the solr index and remote database. This can also take a lot of RAM
+if you have a very large index (~50MM things => 5GB RAM for the map alone) so be
+aware of that.
+
+Polarized is implemented as a post-filter which means it is evaluated last among 
+solr filters at query time. 
+
+(C) PolarizedPlugin (xml schema parsing, wraps qparser)
+  (C) PolarizedQParser (query parameter parsing, logic of combining filters (-/+))
+    (C) PolarizedQuery (wraps filter, handles caching)
+      (C) PolarizedFilter (converts ids to lucene ids, calls fetcher)
+        (I) PolarizedFetcher (fetches ids when given a key, hits db to see if cache is fresh)
+

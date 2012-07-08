@@ -1,0 +1,7 @@
+<ivy-module version="2.0">
+    <info organisation="org.echonest" module="percolator"/>
+    <dependencies>
+      <dependency org="org.apache.solr" name="solr-core" rev="3.6.0"/>
+      <dependency org="mysql" name="mysql-connector-java" rev="5.1.20"/>
+    </dependencies>
+</ivy-module>

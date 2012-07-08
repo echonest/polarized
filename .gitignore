@@ -4,3 +4,11 @@
 *.jar
 *.war
 *.ear
+
+# emacs temp files #
+*~
+*#
+.#*
+
+# mac osx resource crap #
+*.DS_Store
