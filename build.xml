@@ -16,11 +16,13 @@
    specific language governing permissions and limitations
    under the License.    
 -->
-<project name="percolator" default="run" xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="polarized" default="run" xmlns:ivy="antlib:org.apache.ivy.ant">
     <!-- some variables used -->
     <property name="lib.dir" value="lib" />
     <property name="build.dir" value="build" />
     <property name="src.dir" value="src" />
+    <property name="dist.dir" value="dist" />
+    <property name="example.dir" value="example" />
     
     <!-- paths used for compilation and run  -->
     <path id="lib.path.id">
@@ -37,6 +39,34 @@
     <target name="resolve" description="--> retreive dependencies with ivy">
         <ivy:retrieve/>
     </target>    
+
+    <!-- ================================= 
+          target: build              
+         ================================= -->
+    <target name="build" depends="resolve" description="--> build the library">
+      <mkdir dir="${build.dir}" />
+      <javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="lib.path.id" includeAntRuntime="false"/>
+    </target>
+
+    <!-- ================================= 
+          target: dist
+         ================================= -->
+    <target name="dist" depends="build" description="--> make a jar">
+      <mkdir dir="${dist.dir}" />
+      <tstamp/>
+      <jar jarfile="${dist.dir}/${ant.project.name}-${DSTAMP}.jar" basedir="${build.dir}"/>
+    </target>    
+
+    <!-- ================================= 
+          target: copylib
+         ================================= -->
+    <target name="copylib" depends="dist" description="--> copy jar to example dir">
+      <tstamp/>
+      <copy file="${dist.dir}/${ant.project.name}-${DSTAMP}.jar" todir="${example.dir}/solr/conf/lib/"/> 
+      <copy todir="${example.dir}/solr/conf/lib/" overwrite="true">
+	<fileset dir="${lib.dir}"/>
+      </copy>
+    </target>
     
     <!-- ================================= 
           target: report              
@@ -49,13 +79,8 @@
           target: clean              
          ================================= -->
     <target name="clean" description="--> clean the project">
-        <delete includeemptydirs="true">
-            <fileset dir="${basedir}">
-            	<exclude name="src/**" />
-            	<exclude name="build.xml" />
-              <exclude name="ivy.xml" />
-        	</fileset>
-    	</delete>
+      <delete dir="${build.dir}"/>
+      <delete dir="${dist.dir}"/>
     </target>
 	
     <!-- ================================= 

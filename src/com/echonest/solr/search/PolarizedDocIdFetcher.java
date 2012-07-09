@@ -1,14 +1,18 @@
 package com.echonest.solr.search;
 
+import org.apache.solr.common.util.NamedList;
+
 import java.util.List;
 
 public interface PolarizedDocIdFetcher {
 
-    public void open();
+    public void init(NamedList args);
 
-    public List<String> getDocIdList(String filterSetId);
+    public String[] getDocIdList(String filterSetId);
 
-    public Boolean hasMoreRecentIdList(String filterSetId);
+    public int getCacheVersion(String filterSetId);
 
-    public void close();
+    public boolean isFresh(String filterSetId, String cacheVersion);
+
+
 }

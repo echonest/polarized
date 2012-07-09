@@ -8,33 +8,30 @@ import org.apache.solr.search.FunctionQParserPlugin;
 import org.apache.solr.search.QParser;
 import org.apache.lucene.search.Filter;
 import org.apache.solr.search.QueryParsing;
-import org.apache.solr.search.function.FunctionQuery;
-import org.apache.solr.search.function.QueryValueSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class PolarizedQParser extends QParser{
+public class PolarizedQParser extends QParser {
     private static final Logger logger = LoggerFactory.getLogger(PolarizedQParser.class);
+    private final PolarizedDocIdFetcher docIdFetcher;
 
-    public PolarizedQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req) {
+    public PolarizedQParser(String qstr, SolrParams localParams, SolrParams params, SolrQueryRequest req, PolarizedDocIdFetcher d) {
         super(qstr, localParams, params, req);
-    }
-
-    private Filter getFilter(String filterSetId) {
-        return new PolarizedFilter(filterSetId);
+        docIdFetcher = d;
     }
 
     @Override
     public Query parse() throws ParseException {
         String funcStr = localParams.get(QueryParsing.V, null);
-        Query funcQ = subQuery(funcStr, FunctionQParserPlugin.NAME).getQuery();
 
         //TODO: remove
-        logger.warn(String.format("funcQ: %s", funcQ.toString()));
+        logger.info(String.format("localparams: %s", localParams.toString()));
+        logger.info(String.format("funcStr: %s", funcStr));
 
-        // create a filter of our catalogs
-        Filter pFilter = getFilter("ABCDE");
+        // create a filter from our catalog
+        // TODO: this needs to handle multiple catalogs and join them in      the specified way
+        Filter pFilter = new PolarizedFilter(docIdFetcher,  funcStr);
 
         // make a new PercolatorQuery from the filter and return that
         return new PolarizedQuery(pFilter);
