@@ -1,5 +1,6 @@
-package com.echonest.solr.search;
+package com.echonest.solr;
 
+import com.echonest.solr.search.PolarizedDocIdFetcher;
 import com.whalin.MemCached.MemCachedClient;
 import com.whalin.MemCached.SockIOPool;
 import org.apache.solr.common.params.SolrParams;
@@ -41,18 +42,19 @@ public class PolarizedMemcacheFetcher implements PolarizedDocIdFetcher {
         mc = new MemCachedClient("PPool");
     }
 
-    public List<String> getDocIdList(String filterSetId) {
+    public String[] getDocIdList(String filterSetId) {
         Object rawVal = mc.get(filterSetId);
         if (rawVal == null) {
-            return new ArrayList<String>();
+            return new String[]{};
         }
         ArrayList<String> filterList = new ArrayList<String>();
 
         for (String s : ((String)rawVal).split(",")) {
             filterList.add(s.replace(" ", ""));
         }
+
         logger.info(String.format("retrieved %s: %s", filterSetId, filterList.toString()));
-        return filterList;
+        return (String[])filterList.toArray();
     }
 
     public boolean isFresh(String filterSetId, String cacheVersion) {

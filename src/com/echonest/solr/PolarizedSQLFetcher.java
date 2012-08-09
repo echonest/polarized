@@ -1,5 +1,6 @@
-package com.echonest.solr.search;
+package com.echonest.solr;
 
+import com.echonest.solr.search.PolarizedDocIdFetcher;
 import org.apache.solr.common.util.NamedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
